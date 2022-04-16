@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ <!-- 产品信息字段配置信息 -->
+ <hibernate-mapping>
+ 	<class name="com.SpringExample.model.StudentCourse" table="tab_student_course">
+
+ 		<composite-id name="scPk" class="com.SpringExample.model.StudentCoursePK" >
+			<key-property name="stuNo" column="stu_no" type="string"></key-property>
+			<key-property name="courseNo" column="course_no" type="string"></key-property>
+		</composite-id>
+		<property name="year" type="string" length="10">
+			<column name="year"/>
+		</property>
+		<property name="teacherName" type="string" length="50">
+			<column name="teacher_name"/>
+		</property>
+		<property name="score" type="int">
+			<column name="score"/>
+		</property>
+		<property name="remark" type="string" length="100">
+			<column name="remark"/>
+		</property>
+
+		<many-to-one name="student" class="com.SpringExample.model.Student" insert="false" update="false">
+			<column name="stu_no"></column>
+		</many-to-one>
+ 	</class>
+ </hibernate-mapping>

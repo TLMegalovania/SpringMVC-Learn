@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--把对象的创建交给spring来管理-->
+    <bean id="accountDao1" class="com.SpringExample.dao.AccountDaoImpl_1"></bean>
+    <bean id="accountDao2" class="com.SpringExample.dao.AccountDaoImpl_2"></bean>
+
+    <bean id="accountDao3" class="com.SpringExample.dao.AccountDaoImpl_3">
+        <constructor-arg name="_name" value="Hi"></constructor-arg>
+        <constructor-arg name="_money" value="10"></constructor-arg>
+    </bean>
+
+    <bean id="accountDao3_2" class="com.SpringExample.dao.AccountDaoImpl_3">
+        <property name="name" value="hi"></property>
+        <property name="money" value="100"></property>
+        <property name="birthday" ref="now"></property>
+        <property name="testSet">
+            <set>
+                <value>AAA</value>
+                <value>BBB</value>
+                <value>CCC</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="now" class="java.util.Date"></bean>
+
+    <!--自定义实例工厂-->
+    <bean id="instantFactory" class="com.SpringExample.factory.InstanceFactory">
+    </bean>
+
+    <!--交给自定义实例工厂去构造-->
+    <bean id="accountDao1_1" factory-bean="instantFactory" factory-method="createAccountDao"></bean>
+
+    <!--交给自定义静态工厂去构造-->
+    <bean id="accountDao1_2" class="com.SpringExample.factory.StaticFactory" factory-method="createAccountDao"></bean>
+
+    <!--交给spring，实现依赖注入-->
+    <bean id="accountService3_1" class ="com.SpringExample.service.AccountServiceImpl_3" >
+        <property name="accountDao" ref="accountDao1"></property>
+    </bean>
+
+    <bean id="accountService3_2" class ="com.SpringExample.service.AccountServiceImpl_3" >
+        <property name="accountDao" ref="accountDao3_2"></property>
+    </bean>
+
+
+    <!--告知spring创建容器时要扫描的包-->
+    <context:component-scan base-package="com.SpringExample"></context:component-scan>
+
+    <context:property-placeholder location="classpath:jdbc.properties" />
+    <!--定义数据源（连接池）-->
+    <bean id ="dataSource_mysql" class= "com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name ="driverClassName"><value>${mysql.driver}</value></property>
+        <property name ="url"><value>${mysql.url}</value></property>
+        <property name ="username"><value>${mysql.username}</value></property>
+        <property name ="password"><value>${mysql.password}</value></property>
+        <property name="initialSize"><value>${mysql.initialSize}</value></property>
+        <property name="maxActive"><value>${mysql.maxActive}</value></property>
+    </bean>
+
+    <!--
+    <bean id ="dataSource_oracle" class= "com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name ="driverClassName"><value>${oracle.driver}</value></property>
+        <property name ="url"><value>${oracle.url}</value></property>
+        <property name ="username"><value>${oracle.username}</value></property>
+        <property name ="password"><value>${oracle.password}</value></property>
+        <property name="initialSize"><value>${oracle.initialSize}</value></property>
+        <property name="maxActive"><value>${oracle.maxActive}</value></property>
+    </bean>
+    -->
+
+    <!--定义jdbc-->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg ref="dataSource_mysql"></constructor-arg>
+    </bean>
+
+    <bean id="namedParameterJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+        <constructor-arg ref="dataSource_mysql"></constructor-arg>
+    </bean>
+
+    <!--
+    <bean id="jdbcTemplate_oracle" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg ref="dataSource_oracle"></constructor-arg>
+    </bean>
+
+    <bean id="namedParameterJdbcTemplate_oracle" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+        <constructor-arg ref="dataSource_oracle"></constructor-arg>
+    </bean>
+    -->
+
+    <!--定义hibernate所需要的session factory-->
+    <!-- session工厂 -->
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource_mysql" />
+        <!--引入映射文件-->
+        <!--方式1: mappingResources 指定classpath下具体映射文件名 -->
+        <property name="mappingResources">
+            <list>
+                <value>com/SpringExample/hibernate/Product.hbm.xml</value>
+                <value>com/SpringExample/hibernate/Account.hbm.xml</value>
+            </list>
+        </property>
+
+        <!--方式2：mappingLocations 可以指定任何文件路径（类所在文件包名，需要类用注解@Entity,字段用注解@Column）-->
+        <!--
+        <property name="mappingLocations">
+            <list>
+                <value>classpath:com/SpringExample/model/</value>
+            </list>
+        </property>
+        -->
+
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">false</prop>
+
+
+                <!-- 开启二级缓存
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                -->
+                <!-- 启用查询缓存
+                <prop key="hibernate.cache.use_query_cache">true</prop>
+                -->
+                <!-- 配置二级缓存提供商
+                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+                -->
+                <!-- 加载缓存所需配置文件
+                <prop key="hibernate.net.sf.ehcache.configurationResourceName">classpath:ehcache.xml</prop>
+                -->
+            </props>
+        </property>
+    </bean>
+
+    <!-- 配置aop-->
+    <aop:config>
+        <!--配置切面-->
+        <aop:aspect id="logAspect" ref="loggerAspect">
+
+            <!--配置通知类型-->
+            <aop:before method="printStartLog" pointcut="execution(* com.SpringExample.service.*.*(..))"></aop:before>
+            <aop:after method="printEndLog" pointcut="execution(* com.SpringExample.service.*.*(..))"></aop:after>
+
+        </aop:aspect>
+
+        <aop:aspect id="aroundAspect" ref="aroundAspect">
+            <!--配置通知类型-->
+            <aop:around method="doAround" pointcut="execution(* com.SpringExample.service.*.find*(..))"></aop:around>
+
+        </aop:aspect>
+    </aop:config>
+
+    <!--配置spring开启注解AOP的支持-->
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+
+    <!--配置事务管理器-->
+    <!--
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource_mysql"></property>
+    </bean>
+    -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <!--配置事务的通知-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED" read-only="false"/>
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true"></tx:method>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--配置事务的切面（切入点和通知）-->
+    <aop:config>
+        <!--配置切入点-->
+        <aop:pointcut id="pt1" expression="execution(* com.SpringExample.service.*.*(..))"/>
+        <!--配置事务切入点和事务通知的对应关系-->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pt1"></aop:advisor>
+    </aop:config>
+
+    <!--开启事务管理器对注解事务的支持-->
+    <tx:annotation-driven transaction-manager="transactionManager"></tx:annotation-driven>
+
+</beans>

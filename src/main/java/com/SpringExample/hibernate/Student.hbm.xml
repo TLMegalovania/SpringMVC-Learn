@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ <!-- 产品信息字段配置信息 -->
+ <hibernate-mapping>
+ 	<class name="com.SpringExample.model.Student" table="tab_student">
+
+ 		<id name="stuNo" column="stu_no" type="string" length="30">
+			<generator class="assigned"/>
+		</id>
+		<property name="stuName" type="string" length="50">
+			<column name="stu_name"/>
+		</property>
+		<property name="sex" type="string" length="10">
+			<column name="sex"/>
+		</property>
+		<property name="tel" type="string" length="20">
+			<column name="tel"/>
+		</property>
+		<property name="email" type="string" length="100">
+			<column name="email"/>
+		</property>
+
+		<set name="studentCourses" inverse="true">
+			<key column="stu_no"></key>
+			<one-to-many  class="com.SpringExample.model.StudentCourse"></one-to-many>
+		</set>
+ 	</class>
+ </hibernate-mapping>

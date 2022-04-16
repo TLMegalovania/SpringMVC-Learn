@@ -1,0 +1,61 @@
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+	"http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+	<constant name="struts.enable.DynamicMethodInvocation" value="true" />
+
+	<!-- 声明包 -->
+	<package name="myPackage" namespace="/" extends="struts-default">
+
+		<global-allowed-methods>add,update,get</global-allowed-methods>
+
+
+
+		<!-- 定义action 1 -->
+		<action name="first">
+			<!-- 定义处理成功后的映射页面 -->
+			<result>/struts/first.jsp</result>
+		</action>
+
+		<!-- 定义action 2，访问默认方法 -->
+		<action name="greeting" class="com.SpringExample.struts.actions.GreetingAction">
+			<!-- 定义成功的映射页面 -->
+			<result name="success">/struts/success.jsp</result>
+			<!-- 定义失败的映射页面 -->
+			<result name="error">/struts/error.jsp</result>
+		</action>
+
+		<!-- 定义action，访问指定方法 -->
+		<action name="userAction" class="com.SpringExample.struts.actions.UserAction" method="add">
+			<!-- 添加成功的映射页面 -->
+			<result name="success">/struts/user_add.jsp</result>
+			<result name="error">/struts/error.jsp</result>
+		</action>
+
+
+		<action name="userAction" class="com.SpringExample.struts.actions.UserAction" method="update">
+			<result name="success">/struts/user_update.jsp</result>
+			<result name="error">/struts/error.jsp</result>
+		</action>
+
+		<!-- 定义action，访问通配符,访问同一个action的不同方法，并返回动态结果 -->
+		<action name="userAction_*" class="com.SpringExample.struts.actions.UserAction" method="{1}">
+			<result name="success">/struts/user_{1}.jsp</result>
+			<result name="error">/struts/error.jsp</result>
+		</action>
+
+		<!-- 定义action，访问通配符,访问不同action的默认方法 -->
+		<action name="*Action" class="com.SpringExample.struts.actions.{1}Action">
+
+			<result name="error">/struts/error.jsp</result>
+			<result name="success">/struts/first.jsp</result>
+		</action>
+
+		<action name="productAction_*" class="com.SpringExample.struts.actions.ProductAction" method="{1}">
+			<!-- 定义成功的映射页面 -->
+			<result name="success">/struts/successProduct.jsp</result>
+			<!-- 定义失败的映射页面 -->
+			<result name="error">/struts/error.jsp</result>
+		</action>
+	</package>
+</struts>

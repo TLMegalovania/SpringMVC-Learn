@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ <!-- 产品信息字段配置信息 -->
+ <hibernate-mapping>
+ 	<class name="com.SpringExample.model.Course" table="tab_course">
+
+ 		<id name="courseNo" column="course_no" type="string" length="20">
+			<generator class="assigned"/>
+		</id>
+		<property name="courseName" type="string" length="50">
+			<column name="course_name"/>
+		</property>
+		<property name="xf" type="double">
+			<column name="xf"/>
+		</property>
+		<property name="remark" type="string" length="100">
+			<column name="remark"/>
+		</property>
+ 	</class>
+ </hibernate-mapping>
